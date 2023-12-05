@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Safe Records!</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #56bfbfad;
+      }
+
+      h1 {
+        text-align: center;
+        position: relative;
+        right: 500px;
+        bottom: 100px;
+        top: 200px;
+      }
+
+      h3 {
+        position: relative;
+        right: 500px;
+        top: 40px;
+      }
+
+      form {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      label {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      label:hover {
+        background-color: #2980b9;
+      }
+
+      #fileInput {
+        display: none;
+      }
+
+      #selectedFile {
+        margin-top: 10px;
+        font-weight: bold;
+        position: relative;
+        right: 500px;
+        bottom: 120px;
+      }
+
+      #hash {
+        margin-top: 10px;
+        font-weight: bold;
+        position: relative;
+        right: 300px;
+        top: 180px;
+      }
+
+      button:hover {
+        background-color: #27ae60;
+      }
+
+      button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        position: relative;
+        right: 500px;
+        bottom: 120px;
+      }
+
+      /* For submitting file to the database */
+      #uploadForm {
+        position: relative;
+        top: 300px;
+      }
+
+      /* Choose a File : This button chooses files from the system to be uploaded to the database */
+      .choose1 {
+        position: relative;
+        right: 500px;
+        bottom: 120px;
+      }
+      /* Upload : This button uploads file to database */
+      .uploadFile {
+        position: relative;
+        right: 380px;
+      }
+      /* Enter ID : This is the space to enter ID of the file to get the file from the database */
+      .input4 {
+        position: relative;
+        right: 500px;
+        top: 20px;
+      }
+      /* Get File : This is the button to get the file from the database */
+      .getFile {
+        position: relative;
+        top: 70px;
+        right: 620px;
+      }
+
+      /* Title : Upload to Blockchain */
+      .title {
+        font-size: 30px;
+        font: bold;
+        position: relative;
+        bottom: 300px;
+        left: 480px;
+        top: 10px;
+        padding-bottom: 200px;
+      }
+
+      /* For submitting the uploadHash transaction to the ledger */
+      #uploadForm1 {
+        position: relative;
+        top: 120px;
+      }
+
+      /* User Name : This sapce takes the registered User Name as input to submit the transaction to the ledger */
+      .inputUserName {
+        position: relative;
+        bottom: 330px;
+        left: 620px;
+      }
+
+      /* ID : This space takes file ID as the input to submit the transaction to the ledger */
+      .inputID {
+        position: relative;
+        bottom: 300px;
+        left: 470px;
+      }
+
+      /* Hash : This space takes file Hash as the input to submit the transaction to the ledger */
+      .inputHash {
+        position: relative;
+        bottom: 270px;
+        left: 319px;
+      }
+
+      /* Submit Transaction : This button uploads the file ID and file Hash as the key value pair to the ledger */
+      .submitTxn {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        position: relative;
+        left: 670px;
+        bottom: 260px;
+      }
+
+      /* Enter ID, query the ledger : This space takes file ID as the input to query the ledger */
+      .queryByID {
+        position: relative;
+        left: 510px;
+        bottom: 200px;
+      }
+
+      /* Enter User Name, Query the ledger : This space takes User Name as the input to query the ledger*/
+      .queryByUserName {
+        position: relative;
+        left: 360px;
+        bottom: 160px;
+      }
+
+      /* Get Hash : This button submits the ID and UserName to query the ledger and get the hash(if exists) corresponding to the ID */
+      .getHash {
+        position: relative;
+        left: 230px;
+        bottom: 120px;
+      }
+
+      /* Title : Compute Hash */
+      .title2 {
+        font-size: 20px;
+        position: relative;
+        right: 30px;
+        top: 5px;
+      }
+
+      #uploadForm2 {
+        position: relative;
+        bottom: 30px;
+      }
+
+      /* Choose File : This button allows to choose the file to calculate the Hash of the file */
+      .choose2 {
+        position: relative;
+        right: 30px;
+        top: 30px;
+      }
+
+      /* Compute Hash : this button calculates the Hash of the file */
+      .computeHash {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        position: relative;
+        right: 30px;
+        top: 50px;
+      }
+
+      /* This the class function that allows users to enter their name and get themselves registered to the network */
+      .registerForm {
+        text-align: center;
+        margin-top: 20px;
+        position: relative;
+        left: 650px;
+        bottom: 600px;
+      }
+
+      /* User Name : This space takes User Name as the input to register a User*/
+      .registerUserByName {
+        position: relative;
+        bottom: 170px;
+      }
+
+      /* Register : This button submit the transaction to register the User */
+      .register {
+        position: relative;
+        background-color: #2ecc71;
+        right: 120px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- For the Database part -->
+    <h1>Upload to Database!</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input
+        type="file"
+        name="file"
+        id="fileInput"
+        onchange="displaySelectedFile()"
+      />
+      <label for="fileInput" class="choose1">Choose a file</label>
+      <div id="selectedFile"></div>
+      <button type="button" onclick="uploadFile()" class="uploadFile">
+        Upload
+      </button>
+      <!-- <h3>Get files from database</h3> -->
+      <input
+        type="text"
+        id="password"
+        name="password"
+        required
+        class="input4"
+        placeholder="Enter MongoDB ID"
+      />
+      <button type="button" onclick="handleGetFile()" class="getFile">
+        Get file
+      </button>
+    </form>
+    <p id="hash"></p>
+    <p id="fileId"></p>
+
+    <!-- For blockchain part -->
+    <h1 class="title">Upload to blockchain!</h1>
+    <form id="uploadForm1" enctype="multipart/form-data">
+      <input
+        type="file"
+        name="file"
+        id="fileInput1"
+        onchange="displaySelectedFile()"
+      />
+      <input
+        type="text"
+        id="password"
+        name="User name"
+        required
+        class="inputUserName"
+        placeholder="User name"
+      />
+      <input
+        type="text"
+        id="password"
+        name="password"
+        required
+        class="inputID"
+        placeholder="ID"
+      />
+      <input
+        type="text"
+        id="password"
+        name="password"
+        required
+        class="inputHash"
+        placeholder="Hash"
+      />
+      <div id="selectedFile1"></div>
+      <button type="button" onclick="handleUploadHash()" class="submitTxn">
+        Submit transaction
+      </button>
+      <!-- <h2>Query the ledger</h2> -->
+      <input
+        type="text"
+        id="password"
+        name="password"
+        required
+        class="queryByID"
+        placeholder="Enter ID, Query ledger"
+      />
+      <input
+        type="text"
+        id="password"
+        name="password"
+        required
+        class="queryByUserName"
+        placeholder="Enter User Name, Query ledger"
+      />
+      <button type="button" onclick="handleQueryHash()" class="getHash">
+        Get hash
+      </button>
+    </form>
+    <!-- <div id="hash"></div> -->
+
+    <!-- For hash button -->
+    <h1 class="title2">File hash</h1>
+    <form id="uploadForm2" enctype="multipart/form-data">
+      <input
+        type="file"
+        name="file"
+        id="fileInput2"
+        onchange="displaySelectedFile()"
+      />
+      <label for="fileInput" class="choose2">Choose a file</label>
+      <div id="selectedFile1"></div>
+      <button type="button" onclick="handleComputeHash()" class="computeHash">Compute Hash</button>
+    </form>
+    <div id="hashResult"></div>
+
+    <!-- For registering the User -->
+    <div class="registerForm">
+      <input
+        type="text"
+        id="password"
+        name="User name"
+        required
+        class="registerUserByName"
+        placeholder="User name"
+      />
+      <button type="button" onclick="handleRegisterUser()" class="register">
+        Register
+      </button>
+    </div>
+
+    <script>
+      function displaySelectedFile() {
+        const fileInput = document.getElementById("fileInput");
+        const selectedFile = document.getElementById("selectedFile");
+
+        if (fileInput.files.length > 0) {
+          selectedFile.innerText = `Selected File: ${fileInput.files[0].name}`;
+        } else {
+          selectedFile.innerText = "";
+        }
+      }
+
+      function handleRegisterUser() {
+        const username = document.querySelector(".registerUserByName").value;
+
+        fetch("/registerUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username }),
+        })
+          .then((response) => {
+            // Log the entire response for debugging
+            console.log("Full response from server:", response);
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data); // You can handle the parsed JSON response here
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            if (error.response) {
+              // The request was made and the server responded with a status code that falls out of the range of 2xx
+              console.error(
+                "Server responded with error:",
+                error.response.data
+              );
+            } else if (error.request) {
+              // The request was made but no response was received
+              console.error("No response received from the server");
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              console.error("Request setup error:", error.message);
+            }
+          });
+      }
+
+      function handleUploadHash() {
+        const username = document.querySelector(".inputUserName").value;
+        const idofdoc = document.querySelector(".inputID").value;
+        const hashofdoc = document.querySelector(".inputHash").value;
+
+        fetch("/uploadHash", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, idofdoc, hashofdoc }),
+        })
+          .then((response) => {
+            console.log("Full response from server : ", response);
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            if (error.response) {
+              console.error(
+                "Server responded with error: ",
+                error.response.data
+              );
+            } else if (error.request) {
+              console.error("No response received from the server");
+            } else {
+              console.error("Request setup error:", error.message);
+            }
+          });
+      }
+
+      function handleQueryHash() {
+        const qid = document.querySelector(".queryByID").value;
+        const un = document.querySelector(".queryByUserName").value;
+
+        fetch("/queryLedger", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ qid, un }),
+        })
+          .then((response) => {
+            console.log("Full response from server : ", response);
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            if (error.response) {
+              console.error(
+                "Server responded with error: ",
+                error.response.data
+              );
+            } else if (error.request) {
+              console.error("No response received from the server");
+            } else {
+              console.error("Request setup error:", error.message);
+            }
+          });
+      }
+
+      function handleGetFile() {
+        var fileId = document.getElementById("password").value;
+
+        fetch("http://localhost:3000/getfile", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ fileId: fileId }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("File not found");
+            }
+            return response.blob();
+          })
+          .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = fileId; // Change this to use a proper filename if available
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      }
+
+      async function uploadFile() {
+        const fileInput = document.getElementById("fileInput");
+        const selectedFile = document.getElementById("selectedFile");
+        const hashDisplay = document.getElementById("hash");
+        const fileIdDisplay = document.getElementById("fileId");
+
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const formData = new FormData();
+          formData.append("file", file);
+
+          try {
+            const response = await fetch("/upload", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (response.ok) {
+              const data = await response.text();
+              const [hash, fileId] = data.split(","); //Split the response into hash and ID
+              hashDisplay.innerText = hash;
+              fileIdDisplay.innerText = `MongoDb ID : ${fileId}`; //Displays MongoDB ID
+              selectedFile.innerText = "";
+              fileInput.value = ""; // Clear the file input
+            } else {
+              console.error("Failed to upload file.");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        } else {
+          selectedFile.innerText = "Please choose a file.";
+        }
+      }
+
+      async function handleComputeHash() {
+        const fileInput = document.querySelector(".choose2");
+        const selectedFile1 = document.getElementById("selectedFile1");
+        const hashDisplay = document.getElementById("hashResult");
+
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const formData = new FormData();
+          formData.append("file", file);
+
+          try {
+            const response = await fetch("/calHash", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (response.ok) {
+              const hashResult = await response.text(); // Get the hash from the response
+              hashDisplay.innerText = hashResult;
+              selectedFile.innerText = "";
+              fileInput.value = ""; // Clear the file input
+            } else {
+              console.error("Failed to calculate Hash.");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        } else {
+          selectedFile.innerText = "Choose a file.";
+        }
+      }
+    </script>
+  </body>
+</html>
