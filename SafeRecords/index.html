@@ -13,7 +13,7 @@
         justify-content: center;
         height: 100vh;
         margin: 0;
-        background-color: #56bfbfad;
+        background-color: #84ebeb;
       }
 
       h1 {
@@ -64,6 +64,12 @@
         bottom: 120px;
       }
 
+      #selectedFile2{
+        position: relative;
+        top: 300px;
+        left: 200px;
+      }
+
       #hash {
         margin-top: 10px;
         font-weight: bold;
@@ -106,6 +112,13 @@
         position: relative;
         right: 380px;
       }
+
+      #fileId {
+        position: relative;
+        top: 160px;
+        right: 370px;
+      }
+
       /* Enter ID : This is the space to enter ID of the file to get the file from the database */
       .input4 {
         position: relative;
@@ -157,6 +170,12 @@
         left: 319px;
       }
 
+      #submitContainer{
+        position: relative;
+        bottom: 250px;
+        left: 470px;
+      }
+
       /* Submit Transaction : This button uploads the file ID and file Hash as the key value pair to the ledger */
       .submitTxn {
         margin-top: 10px;
@@ -167,7 +186,7 @@
         cursor: pointer;
         transition: background-color 0.3s;
         position: relative;
-        left: 670px;
+        left: 470px;
         bottom: 260px;
       }
 
@@ -190,6 +209,17 @@
         position: relative;
         left: 230px;
         bottom: 120px;
+      }
+
+      #queryID{
+        position: relative;
+        margin-left: 180px;
+      }
+
+      #queryContainer{
+        position: relative;
+        bottom: 100px;
+        left: 470px;
       }
 
       /* Title : Compute Hash */
@@ -247,6 +277,13 @@
         background-color: #2ecc71;
         right: 120px;
       }
+
+      #outputContainer {
+        position: relative;
+        bottom: 100px;
+        right: 40px;
+        
+      }
     </style>
   </head>
   <body>
@@ -257,7 +294,7 @@
         type="file"
         name="file"
         id="fileInput"
-        onchange="displaySelectedFile()"
+        onchange="displaySelectedFile(id)"
       />
       <label for="fileInput" class="choose1">Choose a file</label>
       <div id="selectedFile"></div>
@@ -317,10 +354,12 @@
       <button type="button" onclick="handleUploadHash()" class="submitTxn">
         Submit transaction
       </button>
+      <div id="submitContainer"></div>
+      
       <!-- <h2>Query the ledger</h2> -->
       <input
         type="text"
-        id="password"
+        id="queryID"
         name="password"
         required
         class="queryByID"
@@ -328,7 +367,7 @@
       />
       <input
         type="text"
-        id="password"
+        id="QueryUser"
         name="password"
         required
         class="queryByUserName"
@@ -337,21 +376,26 @@
       <button type="button" onclick="handleQueryHash()" class="getHash">
         Get hash
       </button>
+      <div id ="queryContainer"></div>
     </form>
     <!-- <div id="hash"></div> -->
 
     <!-- For hash button -->
     <h1 class="title2">File hash</h1>
-    <form id="uploadForm2" enctype="multipart/form-data">
+    <form
+      id="uploadForm2"
+      enctype="multipart/form-data"
+      onsubmit="handleComputeHash(event)"
+    >
       <input
         type="file"
         name="file"
         id="fileInput2"
-        onchange="displaySelectedFile()"
+        onchange="displaySelectedFile(id)"
       />
-      <label for="fileInput" class="choose2">Choose a file</label>
-      <div id="selectedFile1"></div>
-      <button type="button" onclick="handleComputeHash()" class="computeHash">Compute Hash</button>
+      <label for="fileInput2" class="choose2">Select File</label>
+      <div id="selectedFile2"></div>
+      <button type="submit" class="computeHash">Compute Hash</button>
     </form>
     <div id="hashResult"></div>
 
@@ -368,11 +412,13 @@
       <button type="button" onclick="handleRegisterUser()" class="register">
         Register
       </button>
+      <div id="outputContainer"></div>
     </div>
+    
 
     <script>
-      function displaySelectedFile() {
-        const fileInput = document.getElementById("fileInput");
+      function displaySelectedFile(id) {
+        const fileInput = document.getElementById(id);
         const selectedFile = document.getElementById("selectedFile");
 
         if (fileInput.files.length > 0) {
@@ -399,6 +445,9 @@
           })
           .then((data) => {
             console.log(data); // You can handle the parsed JSON response here
+
+            const outputContainer = document.getElementById("outputContainer");
+            outputContainer.textContent = data.message;
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -436,6 +485,9 @@
           })
           .then((data) => {
             console.log(data);
+
+            const submitContainer = document.getElementById("submitContainer");
+            submitContainer.textContent = data.message;
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -469,6 +521,8 @@
           })
           .then((data) => {
             console.log(data);
+            const queryContainer = document.getElementById("queryContainer");
+            queryContainer.textContent = data.message;
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -488,7 +542,7 @@
       function handleGetFile() {
         var fileId = document.getElementById("password").value;
 
-        fetch("http://localhost:3000/getfile", {
+        fetch("/getfile", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -510,10 +564,43 @@
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
+          
           })
           .catch((error) => {
             alert(error.message);
           });
+      }
+
+      async function sha256(file) {
+        const buffer = await file.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+          .map((byte) => byte.toString(16).padStart(2, "0"))
+          .join("");
+        return hashHex;
+      }
+
+      async function handleComputeHash(event) {
+        event.preventDefault();
+
+        const fileInput = document.getElementById("fileInput2");
+        const hashResultDiv = document.getElementById("hashResult");
+
+        const file = fileInput.files[0];
+
+        if (!file) {
+          hashResultDiv.innerHTML = "No file selected.";
+          return;
+        }
+
+        try {
+          const hash = await sha256(file);
+          hashResultDiv.innerHTML = `<h2>File Hash:</h2><p>${hash}</p>`;
+        } catch (error) {
+          console.error("Error computing hash:", error);
+          hashResultDiv.innerHTML = "An unexpected error occurred.";
+        }
       }
 
       async function uploadFile() {
@@ -548,38 +635,6 @@
           }
         } else {
           selectedFile.innerText = "Please choose a file.";
-        }
-      }
-
-      async function handleComputeHash() {
-        const fileInput = document.querySelector(".choose2");
-        const selectedFile1 = document.getElementById("selectedFile1");
-        const hashDisplay = document.getElementById("hashResult");
-
-        if (fileInput && fileInput.files && fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          const formData = new FormData();
-          formData.append("file", file);
-
-          try {
-            const response = await fetch("/calHash", {
-              method: "POST",
-              body: formData,
-            });
-
-            if (response.ok) {
-              const hashResult = await response.text(); // Get the hash from the response
-              hashDisplay.innerText = hashResult;
-              selectedFile.innerText = "";
-              fileInput.value = ""; // Clear the file input
-            } else {
-              console.error("Failed to calculate Hash.");
-            }
-          } catch (error) {
-            console.error("Error:", error);
-          }
-        } else {
-          selectedFile.innerText = "Choose a file.";
         }
       }
     </script>

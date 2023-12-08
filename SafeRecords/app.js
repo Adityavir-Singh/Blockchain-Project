@@ -9,6 +9,22 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 
+const dbUrl = "mongodb+srv://NewUser:Mmc6SjGGqkHZYb5u@blockchain-project.nrskyjw.mongodb.net/?retryWrites=true&w=majority";
+
+const connectionParams = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}
+
+// Connect to MongoDB
+mongoose.connect(dbUrl , connectionParams)
+.then(() =>{
+  console.info("Connected to DB");
+})
+.catch((e) => {
+  console.log("Error : " , e);
+});
+
 function startFabricScript() {
   const scriptPath = "./startFabric.sh";
 
@@ -59,7 +75,8 @@ app.post("/registerUser", (req, res) => {
     console.log(`Script ${command} executed successfully.`);
     console.log("Script stdout:", stdout);
 
-    res.status(200).json({ message: "User registered successfully" });
+    //res.status(200).json({ message: "User registered successfully!" });
+    res.status(200).json({ message: stdout });
   });
 });
 
@@ -83,7 +100,7 @@ app.post("/uploadHash", (req, res) => {
     console.log("Script stdout:", stdout);
     // console.error('Script stderr:', stderr);
 
-    res.status(200).json({ message: "Hash uploaded successfully" });
+    res.status(200).json({ message: stdout });
   });
 });
 
@@ -106,14 +123,8 @@ app.post("/queryLedger", (req, res) => {
     console.log("Script stdout:", stdout);
     // console.error('Script stderr:', stderr);
 
-    res.status(200).json({ message: "Hash uploaded successfully" });
+    res.status(200).json({ message: stdout });
   });
-});
-
-// Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/file-upload-app", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
 });
 
 // Create a schema for storing file information
@@ -176,14 +187,6 @@ app.post("/getfile", async (req, res) => {
   } catch (error) {
     res.status(500).send("Error retrieving file: " + error.message);
   }
-});
-
-app.post("/calHash", async (req, res) => {
-  const { originalname, buffer } = req.file;
-
-  const hash = calculateHash(buffer);
-
-  res.send(`SHA-256(${originalname}): ${hash} }`);
 });
 
 // Function to calculate SHA-256 hash
